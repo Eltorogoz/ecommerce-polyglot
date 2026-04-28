@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { api, endpoints } from '../api/client';
 
 export default function Products() {
@@ -95,11 +96,15 @@ export default function Products() {
           <h2 className="text-lg font-semibold text-gray-800 mb-4">Top Rated Products</h2>
           <div className="flex flex-wrap gap-4">
             {topRated.map((p) => (
-              <div key={p._id} className="bg-white px-4 py-2 rounded-md shadow-sm">
+              <Link
+                key={p._id}
+                to={`/products/${p._id}`}
+                className="bg-white px-4 py-2 rounded-md shadow-sm hover:shadow-md transition-shadow"
+              >
                 <span className="font-medium">{p.name}</span>
                 <span className="ml-2 text-yellow-600">★ {p.avgRating?.toFixed(1)}</span>
                 <span className="ml-2 text-gray-500 text-sm">({p.reviewCount} reviews)</span>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -154,19 +159,32 @@ function ProductCard({ product, onUpdate }) {
       ) : (
         <>
           <div className="flex justify-between items-start">
-            <h3 className="font-semibold text-lg text-gray-900">{product.name}</h3>
+            <Link
+              to={`/products/${product._id}`}
+              className="font-semibold text-lg text-gray-900 hover:text-primary-600"
+            >
+              {product.name}
+            </Link>
             <span className="text-primary-600 font-bold">${product.price?.toFixed(2)}</span>
           </div>
           <p className="text-gray-500 text-sm mt-1">{product.category || 'Uncategorized'}</p>
           <p className="text-gray-600 text-sm mt-2 line-clamp-2">{product.description}</p>
           <div className="mt-4 flex justify-between items-center">
             <span className="text-sm text-gray-500">Stock: {product.stock}</span>
-            <button
-              onClick={() => setEditing(true)}
-              className="text-primary-600 text-sm hover:underline"
-            >
-              Edit
-            </button>
+            <div className="flex items-center gap-3 text-sm">
+              <Link
+                to={`/products/${product._id}`}
+                className="text-primary-600 hover:underline"
+              >
+                View & Review
+              </Link>
+              <button
+                onClick={() => setEditing(true)}
+                className="text-gray-500 hover:underline"
+              >
+                Edit
+              </button>
+            </div>
           </div>
         </>
       )}
