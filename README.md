@@ -1,65 +1,63 @@
-# E-Commerce Polyglot Persistence Platform
+# E-Commerce Platform with Polyglot Persistence
 
-A university demo showcasing **polyglot persistence** — using multiple database technologies, each optimized for specific data patterns.
+A full-stack e-commerce application demonstrating **polyglot persistence** — using PostgreSQL for transactional data and MongoDB for flexible product/review data.
 
-## Architecture Overview
+## Live Demo
 
-### Why Polyglot Persistence?
+- **Frontend:** http://localhost:3000
+- **Backend API:** http://localhost:5001
 
-Different data has different access patterns, consistency requirements, and schema flexibility needs. This platform demonstrates when to use SQL vs NoSQL:
+## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        Frontend (React)                         │
-│                    Vite + Tailwind CSS                          │
+│                     Frontend (React + Tailwind)                 │
+│                        localhost:3000                           │
 └─────────────────────────────────────────────────────────────────┘
                                 │
                                 ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                   Backend (Node.js + Express)                   │
-│                                                                 │
-│  ┌─────────────────────────┐    ┌─────────────────────────────┐│
-│  │    SQL Module (pg)      │    │   NoSQL Module (Mongoose)   ││
-│  │                         │    │                             ││
-│  │  • Users                │    │  • Products                 ││
-│  │  • Orders               │    │  • Reviews                  ││
-│  │  • Order Items          │    │                             ││
-│  │  • Payments             │    │                             ││
-│  └───────────┬─────────────┘    └──────────────┬──────────────┘│
-└──────────────┼─────────────────────────────────┼────────────────┘
+│                        localhost:5001                           │
+└─────────────────────────────────────────────────────────────────┘
+               │                                 │
                ▼                                 ▼
 ┌──────────────────────────┐    ┌──────────────────────────────────┐
 │   PostgreSQL (Supabase)  │    │        MongoDB Atlas             │
 │                          │    │                                  │
-│   ACID Transactions      │    │   Flexible Schema                │
-│   Strong Consistency     │    │   Rich Aggregations              │
-│   Referential Integrity  │    │   Nested Documents               │
+│   • users                │    │   • products                     │
+│   • orders               │    │   • reviews                      │
+│   • order_items          │    │                                  │
+│   • payments             │    │                                  │
 └──────────────────────────┘    └──────────────────────────────────┘
 ```
 
-### Data Split Rationale
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | React 18, Vite, Tailwind CSS, React Router |
+| Backend | Node.js, Express.js |
+| SQL Database | PostgreSQL (Supabase) |
+| NoSQL Database | MongoDB Atlas |
+
+## Why Polyglot Persistence?
 
 | Data Type | Database | Reasoning |
 |-----------|----------|-----------|
-| **Users** | PostgreSQL | Requires strong consistency, unique email constraints, password security |
-| **Orders** | PostgreSQL | Financial transactions need ACID guarantees, referential integrity with users |
-| **Order Items** | PostgreSQL | Part of order transaction, linked to orders via FK |
-| **Payments** | PostgreSQL | Critical financial data, audit requirements |
-| **Products** | MongoDB | Varying attributes per category (electronics vs clothing), flexible schema |
-| **Reviews** | MongoDB | Nested data, text-heavy, benefits from aggregation pipelines |
+| **Users** | PostgreSQL | Unique email constraints, password security |
+| **Orders** | PostgreSQL | ACID transactions for financial data |
+| **Payments** | PostgreSQL | Audit requirements, referential integrity |
+| **Products** | MongoDB | Flexible attributes per category |
+| **Reviews** | MongoDB | Text-heavy, aggregation pipelines |
 
-### Cross-Database References
+## Features
 
-- **Order Items → Products**: `product_id` stored as MongoDB ObjectId string in PostgreSQL
-- **Reviews → Users**: `userId` (SQL integer) stored in MongoDB documents
-- Product names denormalized in order_items for display without cross-DB joins
-
-## Tech Stack
-
-- **Frontend**: React 18, Vite, Tailwind CSS, React Router
-- **Backend**: Node.js, Express
-- **SQL Database**: PostgreSQL via Supabase (using `pg` driver)
-- **NoSQL Database**: MongoDB Atlas (using Mongoose ODM)
+- ✅ Full CRUD operations on both databases
+- ✅ Cross-database order creation (PostgreSQL + MongoDB)
+- ✅ MongoDB Aggregation: Top-rated products, Rating summaries
+- ✅ Modern React UI with Tailwind CSS
+- ✅ Real Kaggle dataset integration (Brazilian E-Commerce)
 
 ## Project Structure
 
@@ -68,161 +66,157 @@ ecommerce-polyglot/
 ├── backend/
 │   ├── src/
 │   │   ├── controllers/     # Business logic
-│   │   │   ├── userController.js
-│   │   │   ├── orderController.js
-│   │   │   ├── productController.js
-│   │   │   └── reviewController.js
-│   │   ├── db/
-│   │   │   ├── postgres.js  # PostgreSQL connection
-│   │   │   ├── mongodb.js   # MongoDB connection
-│   │   │   └── schema.sql   # SQL DDL
+│   │   ├── db/              # Database connections + SQL schema
 │   │   ├── models/          # Mongoose schemas
-│   │   │   ├── Product.js
-│   │   │   └── Review.js
-│   │   ├── routes/          # Express routers
-│   │   └── index.js         # Entry point
-│   ├── .env                 # Local config (not in git)
-│   └── .env.example
+│   │   ├── routes/          # API endpoints
+│   │   └── index.js         # Server entry point
+│   └── package.json
 ├── frontend/
 │   ├── src/
-│   │   ├── api/client.js    # API wrapper
+│   │   ├── api/             # API client
 │   │   ├── pages/           # React pages
-│   │   └── App.jsx
-│   ├── .env
-│   └── .env.example
+│   │   └── App.jsx          # Main app component
+│   └── package.json
+├── data/                    # Data transformation scripts
+│   ├── transform-olist.js   # Kaggle data transformer
+│   └── import-to-mongodb.js # MongoDB import helper
+├── docs/
+│   ├── PROJECT_REPORT.md    # Full project report
+│   ├── PRESENTATION_SCRIPT.md
+│   └── er-diagram.md        # Database diagrams
 └── README.md
 ```
 
-## Setup Instructions
+## Quick Start
 
-### 1. Clone and Install
+### Prerequisites
+
+- Node.js 18+
+- Supabase account (free tier)
+- MongoDB Atlas account (free tier)
+
+### 1. Clone & Install
 
 ```bash
+git clone https://github.com/Eltorogoz/ecommerce-polyglot.git
 cd ecommerce-polyglot
 
-# Install backend dependencies
+# Install backend
 cd backend && npm install
 
-# Install frontend dependencies  
+# Install frontend
 cd ../frontend && npm install
 ```
 
 ### 2. Configure Environment
 
-Edit `backend/.env` with your credentials:
+Create `backend/.env`:
 
 ```env
 PORT=5001
-DATABASE_URL=postgresql://postgres:PASSWORD@db.PROJECT.supabase.co:5432/postgres
-MONGODB_URI=mongodb+srv://USER:PASSWORD@cluster.mongodb.net/ecommerce?retryWrites=true&w=majority
+DATABASE_URL=postgresql://user:password@db.xxx.supabase.co:5432/postgres
+MONGODB_URI=mongodb+srv://user:password@cluster.mongodb.net/ecommerce
 ```
 
 ### 3. Initialize PostgreSQL Schema
 
-Run the SQL in `backend/src/db/schema.sql` via:
-- Supabase Dashboard → SQL Editor
-- Or: `psql $DATABASE_URL -f backend/src/db/schema.sql`
+Run in Supabase SQL Editor:
 
-### 4. Run the Application
+```sql
+-- See backend/src/db/schema.sql for full schema
+```
+
+### 4. Start Servers
 
 ```bash
-# Terminal 1: Start backend
+# Terminal 1 - Backend
 cd backend && npm run dev
 
-# Terminal 2: Start frontend
+# Terminal 2 - Frontend  
 cd frontend && npm run dev
 ```
 
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:5001
+### 5. Open Application
 
-## API Reference
+Visit http://localhost:3000
+
+## API Endpoints
 
 ### Health Check
 ```
-GET /api/health
-→ { ok: true, postgres: true, mongodb: true }
+GET /api/health → { ok, postgres, mongodb }
 ```
 
 ### Users (PostgreSQL)
 ```
-GET    /api/users           # List all users
-GET    /api/users/:id       # Get user by ID
-POST   /api/users           # Create user { email, name, password }
-PUT    /api/users/:id       # Update user
-DELETE /api/users/:id       # Delete user
+GET    /api/users
+POST   /api/users
+PUT    /api/users/:id
+DELETE /api/users/:id
 ```
 
 ### Orders (PostgreSQL)
 ```
-GET    /api/orders          # List all orders with items
-GET    /api/orders/:id      # Get order by ID
-POST   /api/orders          # Create order { userId, items: [{productId, quantity}] }
-PUT    /api/orders/:id      # Update order status
-GET    /api/orders/user/:userId  # Get orders by user
+GET    /api/orders
+POST   /api/orders      # Cross-DB: fetches products from MongoDB
+PUT    /api/orders/:id
 ```
 
 ### Products (MongoDB)
 ```
-GET    /api/products        # List products (?category=, ?search=, ?sort=)
-GET    /api/products/:id    # Get product with reviews
-POST   /api/products        # Create product { name, price, stock, category, description }
-PUT    /api/products/:id    # Update product
-DELETE /api/products/:id    # Soft delete (sets isActive=false)
+GET    /api/products
+POST   /api/products
+PUT    /api/products/:id
+DELETE /api/products/:id
+GET    /api/products/analytics/top-rated
+GET    /api/products/:id/rating-summary
 ```
 
 ### Reviews (MongoDB)
 ```
-GET    /api/reviews                    # List reviews (?productId=, ?userId=)
-GET    /api/reviews/:id                # Get review
-POST   /api/reviews                    # Create review { productId, userId, rating, comment }
-PUT    /api/reviews/:id                # Update review
-DELETE /api/reviews/:id                # Delete review
-POST   /api/reviews/:id/helpful        # Vote helpful
-GET    /api/reviews/product/:productId # Reviews for product
+GET    /api/reviews
+POST   /api/reviews
+PUT    /api/reviews/:id
+DELETE /api/reviews/:id
 ```
 
-### Analytics (MongoDB Aggregation)
-```
-GET /api/products/analytics/top-rated    # Top rated products
-GET /api/products/:id/rating-summary     # Rating distribution and stats
-```
-
-## Sample API Calls
-
-```bash
-# Create a user
-curl -X POST http://localhost:5001/api/users \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","name":"Test User","password":"secret123"}'
-
-# Create a product
-curl -X POST http://localhost:5001/api/products \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Laptop","price":999.99,"stock":10,"category":"Electronics"}'
-
-# Create an order (replace IDs)
-curl -X POST http://localhost:5001/api/orders \
-  -H "Content-Type: application/json" \
-  -d '{"userId":1,"items":[{"productId":"MONGO_PRODUCT_ID","quantity":2}]}'
-
-# Get top rated products
-curl http://localhost:5001/api/products/analytics/top-rated
-```
-
-## Advanced MongoDB Aggregation
-
-The platform includes advanced aggregation pipelines:
+## MongoDB Aggregation Examples
 
 ### Top Rated Products
-Aggregates reviews, calculates average ratings, and joins with product data.
+```javascript
+db.reviews.aggregate([
+  { $group: { _id: "$productId", avgRating: { $avg: "$rating" } } },
+  { $sort: { avgRating: -1 } },
+  { $lookup: { from: "products", localField: "_id", foreignField: "_id", as: "product" } }
+])
+```
 
-### Rating Summary
-Uses `$facet` to compute in a single query:
-- Overall statistics (avg rating, total reviews)
-- Rating distribution (1-5 stars)
-- Recent reviews
+### Rating Distribution ($facet)
+```javascript
+db.reviews.aggregate([
+  { $match: { productId: ObjectId("...") } },
+  { $facet: {
+      overall: [{ $group: { _id: null, avgRating: { $avg: "$rating" } } }],
+      distribution: [{ $group: { _id: "$rating", count: { $sum: 1 } } }],
+      recent: [{ $sort: { createdAt: -1 } }, { $limit: 5 }]
+  }}
+])
+```
+
+## Dataset
+
+This project uses the [Brazilian E-Commerce Dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) from Kaggle:
+- 99,441 orders
+- 32,951 products
+- 112,650 order items
+- Customer reviews with ratings
+
+## Documentation
+
+- [Full Project Report](docs/PROJECT_REPORT.md)
+- [Presentation Script](docs/PRESENTATION_SCRIPT.md)
+- [ER Diagram & Schema](docs/er-diagram.md)
 
 ## License
 
-MIT — University project for educational purposes.
+MIT - University project for educational purposes.

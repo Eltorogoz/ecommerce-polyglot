@@ -1,0 +1,9 @@
+# Ignore CSV data files (too large, contains personal data)
+*.csv
+
+# Ignore generated JSON for import
+mongodb_products_import.json
+
+# Keep transform scripts
+!transform-olist.js
+!import-to-mongodb.js
