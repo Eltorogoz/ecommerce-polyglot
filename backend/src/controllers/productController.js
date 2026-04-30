@@ -40,13 +40,13 @@ async function getProductById(req, res) {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    const reviews = await Review.find({ productId: id })
+    const reviews = await Review.find({ productId: String(id) })
       .sort({ createdAt: -1 })
       .limit(10)
       .lean();
 
     const stats = await Review.aggregate([
-      { $match: { productId: product._id } },
+      { $match: { productId: String(product._id) } },
       {
         $group: {
           _id: null,
@@ -76,7 +76,11 @@ async function createProduct(req, res) {
       return res.status(400).json({ message: 'Name, price, and stock are required' });
     }
 
+    const count = await Product.countDocuments();
+    const newId = `prod_${String(count + 1).padStart(6, '0')}`;
+
     const product = new Product({
+      _id: newId,
       name,
       description,
       price,
@@ -196,7 +200,7 @@ async function getRatingSummary(req, res) {
     }
 
     const summary = await Review.aggregate([
-      { $match: { productId: product._id } },
+      { $match: { productId: String(product._id) } },
       {
         $facet: {
           overall: [

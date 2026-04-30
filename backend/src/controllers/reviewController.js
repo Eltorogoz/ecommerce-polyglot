@@ -13,7 +13,6 @@ async function getAllReviews(req, res) {
 
     const reviews = await Review.find(filter)
       .sort({ createdAt: -1 })
-      .populate('productId', 'name price')
       .lean();
 
     res.json(reviews);
@@ -26,9 +25,7 @@ async function getAllReviews(req, res) {
 async function getReviewById(req, res) {
   try {
     const { id } = req.params;
-    const review = await Review.findById(id)
-      .populate('productId', 'name price')
-      .lean();
+    const review = await Review.findById(id).lean();
 
     if (!review) {
       return res.status(404).json({ message: 'Review not found' });
